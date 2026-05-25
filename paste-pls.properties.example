@@ -1,0 +1,16 @@
+# Copy this file to paste-pls.properties and fill in your values.
+
+discord.token=replace-me
+# Optional: set this during development for instant guild-scoped command updates.
+# discord.guild-id=123456789012345678
+
+paste.provider=lucko
+paste.api-base-url=https://api.pastes.dev/
+# Optional: defaults to https://pastes.dev/ for the public service or strips /data/ for self-hosted instances.
+# paste.public-base-url=https://pastes.dev/
+paste.user-agent=paste-pls (github.com/SirYwell/paste-pls)
+
+# "ephemeral" keeps replies visible only to the acting user.
+discord.response-visibility=ephemeral
+discord.attachment-max-bytes=1048576
+http.request-timeout-seconds=20
