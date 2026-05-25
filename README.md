@@ -81,6 +81,11 @@ The repository CI is split into:
 - `CI`: verifies the Gradle Wrapper and runs `nix flake check`, which includes the packaged build and the Gradle test suite under Nix
 - `Qodana`: runs JetBrains Qodana JVM Community and uploads SARIF results to GitHub code scanning
 
+Caching is enabled where it helps:
+
+- the Nix workflow uses **Magic Nix Cache** for binary cache reuse across GitHub Actions runs
+- the Qodana workflow uses Qodana's built-in **GitHub cache** support
+
 This keeps the build/test path reproducible through Nix while still using the purpose-built GitHub actions for wrapper verification and Qodana.
 
 ### NixOS service
