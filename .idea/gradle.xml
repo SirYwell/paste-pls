@@ -11,6 +11,7 @@
           </set>
         </option>
         <option name="myGradleHome" value="" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
       </GradleProjectSettings>
     </option>
   </component>
