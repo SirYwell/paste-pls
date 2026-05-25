@@ -25,6 +25,7 @@ jobs:
         with:
           args: --linter jetbrains/qodana-jvm-community:2026.1
           cache-default-branch-only: true
+          pr-mode: false
           upload-result: true
 
       - name: Upload SARIF
