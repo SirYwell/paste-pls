@@ -3,6 +3,7 @@ package de.sirywell.pastepls.discord;
 import de.sirywell.pastepls.attachment.AttachmentSelection;
 import de.sirywell.pastepls.attachment.TextAttachmentPolicy;
 import de.sirywell.pastepls.config.AppConfig;
+import de.sirywell.pastepls.config.ResponseVisibility;
 import de.sirywell.pastepls.paste.PasteResult;
 import de.sirywell.pastepls.paste.PasteService;
 import de.sirywell.pastepls.paste.PasteUpload;
@@ -81,12 +82,12 @@ public final class PasteDiscordListener extends ListenerAdapter {
             .toList();
         if (eligibleAttachments.isEmpty()) {
             event.reply("No supported text attachments were found on the selected message.")
-                .setEphemeral(config.responseVisibility().ephemeral())
+                .setEphemeral(true)
                 .queue();
             return;
         }
 
-        event.deferReply(config.responseVisibility().ephemeral()).queue(
+        event.deferReply(true).queue(
             hook -> uploadAll(hook, eligibleAttachments),
             error -> LOGGER.error("Failed to defer paste response", error)
         );
@@ -109,12 +110,42 @@ public final class PasteDiscordListener extends ListenerAdapter {
                 if (error != null) {
                     Throwable cause = rootCause(error);
                     LOGGER.warn("Failed to upload attachment", cause);
-                    hook.editOriginal("Upload failed: " + cause.getMessage()).queue();
+                    sendFailureResponse(hook, "Upload failed: " + cause.getMessage());
                     return;
                 }
 
-                hook.editOriginal(formatSuccess(lines, eligibleAttachments.size())).queue();
+                sendSuccessResponse(hook, config.responseVisibility(), formatSuccess(lines, eligibleAttachments.size()));
             });
+    }
+
+    static void sendFailureResponse(InteractionHook hook, String message) {
+        hook.editOriginal(message).queue();
+    }
+
+    static void sendSuccessResponse(InteractionHook hook, ResponseVisibility responseVisibility, String message) {
+        if (responseVisibility.ephemeral()) {
+            hook.editOriginal(message).queue();
+            return;
+        }
+
+        hook.sendMessage(message)
+            .setEphemeral(false)
+            .queue(
+                ignored -> deleteOriginal(hook),
+                error -> sendFailureResponse(hook, formatPublicDeliveryFailure(message, rootCause(error)))
+            );
+    }
+
+    private static void deleteOriginal(InteractionHook hook) {
+        hook.deleteOriginal().queue(
+            ignored -> {
+            },
+            error -> LOGGER.debug("Failed to delete ephemeral placeholder response", error)
+        );
+    }
+
+    static String formatPublicDeliveryFailure(String successMessage, Throwable error) {
+        return successMessage + "\n\nThe public response could not be posted: " + error.getMessage();
     }
 
     private CompletableFuture<String> uploadSingle(EligibleAttachment eligibleAttachment) {

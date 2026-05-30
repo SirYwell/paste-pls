@@ -7,7 +7,7 @@
 1. A user right-clicks a message in Discord and chooses **Apps -> Upload to paste**.
 2. The bot scans the message attachments for supported text files.
 3. Each eligible attachment is downloaded and uploaded to the configured paste service.
-4. The bot replies with the resulting paste URL(s), either ephemerally or publicly based on configuration.
+4. The bot replies with the resulting paste URL(s), either ephemerally or publicly based on configuration. Any error message is always sent ephemerally.
 
 Discord does not expose a bot action on an individual attachment, so the interaction targets the **message containing the attachment(s)**.
 
@@ -29,7 +29,7 @@ Copy `paste-pls.properties.example` to `paste-pls.properties` and fill in the re
 | `paste.api-base-url` | No | `https://api.pastes.dev/` | API base; for self-hosted `lucko/paste` the Docker default is typically `http://localhost:8080/data/` |
 | `paste.public-base-url` | No | Derived | Defaults to `https://pastes.dev/` for the public API, or strips `/data/` from a self-hosted API URL |
 | `paste.user-agent` | Yes for `api.pastes.dev` | `paste-pls/1.0` for non-official hosts | `lucko/paste` requires a unique identifying user agent on the public service |
-| `discord.response-visibility` | No | `ephemeral` | `ephemeral` or `public` |
+| `discord.response-visibility` | No | `ephemeral` | `ephemeral` or `public` for successful uploads; errors stay ephemeral |
 | `discord.attachment-max-bytes` | No | `1048576` | Maximum size per downloaded attachment |
 | `http.request-timeout-seconds` | No | `20` | Timeout for attachment download and paste upload requests |
 
