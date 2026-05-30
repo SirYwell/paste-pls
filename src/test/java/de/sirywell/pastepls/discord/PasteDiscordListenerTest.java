@@ -17,6 +17,7 @@ import de.sirywell.pastepls.config.ResponseVisibility;
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.dv8tion.jda.api.JDA;
@@ -140,7 +141,7 @@ class PasteDiscordListenerTest {
     private static PasteDiscordListener listener(ResponseVisibility responseVisibility) {
         AppConfig config = new AppConfig(
             "token",
-            java.util.OptionalLong.empty(),
+            OptionalLong.empty(),
             new PasteServiceConfig(PasteProvider.LUCKO, URI.create("https://api.pastes.dev/"), URI.create("https://pastes.dev/"), "agent"),
             responseVisibility,
             1_048_576,
