@@ -53,8 +53,7 @@ class PasteDiscordListenerTest {
         MessageContextInteraction interaction = proxy(MessageContextInteraction.class, (proxy, method, args) -> switch (method.getName()) {
             case "getName" -> PasteDiscordListener.COMMAND_NAME;
             case "getTarget" -> emptyMessage();
-            case "reply" -> {
-                replyAction.content = (String) args[0];
+            case "deferReply" -> {
                 yield replyAction.proxy();
             }
             default -> defaultValue(method.getReturnType());
@@ -175,7 +174,11 @@ class PasteDiscordListenerTest {
         private boolean queued;
 
         private ReplyCallbackAction proxy() {
-            return proxy(ReplyCallbackAction.class, (proxy, method, args) -> switch (method.getName()) {
+            return PasteDiscordListenerTest.proxy(ReplyCallbackAction.class, (proxy, method, args) -> switch (method.getName()) {
+                case "setContent" -> {
+                    content = (String) args[0];
+                    yield proxy;
+                }
                 case "setEphemeral" -> {
                     ephemeral.set((Boolean) args[0]);
                     yield proxy;
@@ -199,7 +202,7 @@ class PasteDiscordListenerTest {
         private Throwable createFailure;
 
         private InteractionHook proxy() {
-            return proxy(InteractionHook.class, (proxy, method, args) -> switch (method.getName()) {
+            return PasteDiscordListenerTest.proxy(InteractionHook.class, (proxy, method, args) -> switch (method.getName()) {
                 case "editOriginal" -> {
                     editedMessage.set((String) args[0]);
                     yield editAction();
@@ -215,7 +218,7 @@ class PasteDiscordListenerTest {
 
         @SuppressWarnings("unchecked")
         private WebhookMessageEditAction<Message> editAction() {
-            return proxy(WebhookMessageEditAction.class, (proxy, method, args) -> switch (method.getName()) {
+            return PasteDiscordListenerTest.proxy(WebhookMessageEditAction.class, (proxy, method, args) -> switch (method.getName()) {
                 case "queue" -> {
                     editQueued = true;
                     yield null;
@@ -226,7 +229,7 @@ class PasteDiscordListenerTest {
 
         @SuppressWarnings("unchecked")
         private WebhookMessageCreateAction<Message> createAction() {
-            return proxy(WebhookMessageCreateAction.class, (proxy, method, args) -> switch (method.getName()) {
+            return PasteDiscordListenerTest.proxy(WebhookMessageCreateAction.class, (proxy, method, args) -> switch (method.getName()) {
                 case "setEphemeral" -> {
                     createEphemeral.set((Boolean) args[0]);
                     yield proxy;
@@ -246,7 +249,7 @@ class PasteDiscordListenerTest {
 
         @SuppressWarnings("unchecked")
         private RestAction<Void> deleteAction() {
-            return proxy(RestAction.class, (proxy, method, args) -> switch (method.getName()) {
+            return PasteDiscordListenerTest.proxy(RestAction.class, (proxy, method, args) -> switch (method.getName()) {
                 case "queue" -> {
                     deleteQueued = true;
                     if (args != null && args.length >= 1 && args[0] != null) {
